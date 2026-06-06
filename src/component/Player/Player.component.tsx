@@ -311,7 +311,12 @@ export function PlayerComponent({
   );
 
   const renderBackButton = () => (
-    <View style={ styles.backButtonContainer }>
+    <View
+      style={ [
+        styles.backButtonContainer,
+        isLocked && styles.actionsRowDisabled,
+      ] }
+    >
       <ThemedPressable
         style={ styles.backButton }
         contentStyle={ styles.backButtonContent }
@@ -329,7 +334,7 @@ export function PlayerComponent({
     const { title, hasSeasons } = film;
 
     return (
-      <ThemedText style={ styles.title }>
+      <ThemedText style={ styles.title } numberOfLines={ 1 }>
         {
           // eslint-disable-next-line max-len
           `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
@@ -352,7 +357,7 @@ export function PlayerComponent({
 
   const renderTopInfo = () => (
     <View style={ styles.topInfoWrapper }>
-      { !isLocked && renderBackButton() }
+      { renderBackButton() }
       <View style={ styles.topInfo }>
         { renderTitle() }
         { renderSubtitle() }
@@ -378,14 +383,17 @@ export function PlayerComponent({
     <View style={ styles.topActions }>
       { renderTopInfo() }
       <View style={ styles.actionsRow }>
-        { !isLocked && (
-          <>
-            { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
-            { renderAction(Gauge, openSpeedSelector) }
-            { renderAction(Settings2, openQualitySelector) }
-            { renderSubtitlesActions() }
-          </>
-        ) }
+        <View
+          style={ [
+            styles.actionsRow,
+            isLocked && styles.actionsRowDisabled,
+          ] }
+        >
+          { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
+          { renderAction(Gauge, openSpeedSelector) }
+          { renderAction(Settings2, openQualitySelector) }
+          { renderSubtitlesActions() }
+        </View>
         { renderAction(!isLocked ? LockKeyholeOpen : LockKeyhole, handleLockControls) }
       </View>
     </View>

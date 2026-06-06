@@ -278,6 +278,7 @@ const ru: Translations = {
   'Toggle continue button.': 'Переключить отображение кнопки продолжить просмотр.',
   'Duration end in ': 'Конец в ',
   'Current season or episode not saved.': 'Текущий сезон или эпизод не сохранён.',
+  'Download started': 'Загрузка началась',
 };
 
 export default ru;

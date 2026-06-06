@@ -456,6 +456,8 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
       task.start();
     });
+
+    NotificationStore.displayMessage(t('Download started'));
   };
 
   const openTrailerOverlay = () => {

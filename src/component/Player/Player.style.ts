@@ -39,6 +39,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: scale(16),
     padding: scale(16),
     zIndex: 100,
   },
@@ -98,6 +99,10 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   actionsRow: {
     flexDirection: 'row',
     gap: scale(24),
+  },
+  actionsRowDisabled: {
+    pointerEvents: 'none',
+    opacity: 0,
   },
   bottomActionsRowLine: {
     flexDirection: 'row',

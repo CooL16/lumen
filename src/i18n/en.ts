@@ -276,6 +276,7 @@ const en = {
   'Toggle continue button.': 'Toggle continue button.',
   'Duration end in ': 'Duration end in ',
   'Current season or episode not saved.': 'Current season or episode not saved.',
+  'Download started': 'Download started',
 };
 
 export default en;
