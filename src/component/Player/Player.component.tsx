@@ -40,7 +40,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react-native';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { ComponentType, Fragment, useEffect, useRef, useState } from 'react';
 import { AppState, Dimensions, View } from 'react-native';
 import {
   Gesture,
@@ -125,9 +125,9 @@ export function PlayerComponent({
   const [doubleTapAction, setDoubleTapAction] = useState<DoubleTapAction | null>(null);
   const [longTapAction, setLongTapAction] = useState(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
-  const controlsTimeout = useRef<NodeJS.Timeout | null>(null);
+  const controlsTimeout = useRef<number | null>(null);
   const playerRef = useRef<VideoView>(null);
-  const doubleTapTimeout = useRef<NodeJS.Timeout | null>(null);
+  const doubleTapTimeout = useRef<number | null>(null);
   const isPlayingRef = useRef(isPlaying);
   const showControlsRef = useRef(showControls);
   const isOverlayOpenRef = useRef(isOverlayOpen);
@@ -294,7 +294,7 @@ export function PlayerComponent({
   };
 
   const renderAction = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     action?: () => void
   ) => (
     <GestureDetector gesture={ Gesture.Tap() }>
@@ -329,12 +329,19 @@ export function PlayerComponent({
     const { title, hasSeasons } = film;
 
     return (
-      <ThemedText style={ styles.title }>
-        {
-          // eslint-disable-next-line max-len
-          `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
-        }
-      </ThemedText>
+      <View style={ styles.titleWrapper }>
+        <ThemedText style={ styles.title } numberOfLines={ 1 }>
+          { title }
+        </ThemedText>
+        { hasSeasons && (
+          <ThemedText style={ styles.title }>
+            { t('Season {{season}} - Episode {{episode}}', {
+              season: voice.lastSeasonId,
+              episode: voice.lastEpisodeId,
+            }) }
+          </ThemedText>
+        ) }
+      </View>
     );
   };
 
@@ -378,21 +385,24 @@ export function PlayerComponent({
     <View style={ styles.topActions }>
       { renderTopInfo() }
       <View style={ styles.actionsRow }>
-        { !isLocked && (
-          <>
-            { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
-            { renderAction(Gauge, openSpeedSelector) }
-            { renderAction(Settings2, openQualitySelector) }
-            { renderSubtitlesActions() }
-          </>
-        ) }
+        <View
+          style={ [
+            styles.actionsRow,
+            isLocked && styles.actionsRowDisabled,
+          ] }
+        >
+          { isPictureInPictureSupported() && renderAction(PictureInPicture2, enablePIP) }
+          { renderAction(Gauge, openSpeedSelector) }
+          { renderAction(Settings2, openQualitySelector) }
+          { renderSubtitlesActions() }
+        </View>
         { renderAction(!isLocked ? LockKeyholeOpen : LockKeyhole, handleLockControls) }
       </View>
     </View>
   );
 
   const renderMiddleControl = (
-    IconComponent: React.ComponentType<any>,
+    IconComponent: ComponentType<any>,
     action: () => void,
     size: MiddleActionVariant = 'small'
   ) => (
