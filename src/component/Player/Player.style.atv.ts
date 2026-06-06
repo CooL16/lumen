@@ -55,6 +55,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   },
   topInfo: {
   },
+  titleWrapper: {
+    flexDirection: 'column',
+  },
   title: {
     fontSize: scale(text.xxl.fontSize),
     marginBottom: scale(4),

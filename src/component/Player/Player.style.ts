@@ -115,6 +115,9 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     opacity: 0,
     pointerEvents: 'none',
   },
+  titleWrapper: {
+    flexDirection: 'column',
+  },
   title: {
     fontSize: scale(text.lg.fontSize),
     fontWeight: '700',

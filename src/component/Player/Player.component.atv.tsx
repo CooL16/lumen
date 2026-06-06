@@ -304,12 +304,19 @@ export function PlayerComponent({
     const { title, hasSeasons } = film;
 
     return (
-      <ThemedText style={ styles.title }>
-        {
-          // eslint-disable-next-line max-len
-          `${title}${hasSeasons ? ` ${t('Season {{season}} - Episode {{episode}}', { season: voice.lastSeasonId, episode: voice.lastEpisodeId })}` : ''}`
-        }
-      </ThemedText>
+      <View style={ styles.titleWrapper }>
+        <ThemedText style={ styles.title } numberOfLines={ 1 }>
+          { title }
+        </ThemedText>
+        { hasSeasons && (
+          <ThemedText style={ styles.title }>
+            { t('Season {{season}} - Episode {{episode}}', {
+              season: voice.lastSeasonId,
+              episode: voice.lastEpisodeId,
+            }) }
+          </ThemedText>
+        ) }
+      </View>
     );
   };
 
