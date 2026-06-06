@@ -311,12 +311,7 @@ export function PlayerComponent({
   );
 
   const renderBackButton = () => (
-    <View
-      style={ [
-        styles.backButtonContainer,
-        isLocked && styles.actionsRowDisabled,
-      ] }
-    >
+    <View style={ styles.backButtonContainer }>
       <ThemedPressable
         style={ styles.backButton }
         contentStyle={ styles.backButtonContent }
@@ -364,7 +359,7 @@ export function PlayerComponent({
 
   const renderTopInfo = () => (
     <View style={ styles.topInfoWrapper }>
-      { renderBackButton() }
+      { !isLocked && renderBackButton() }
       <View style={ styles.topInfo }>
         { renderTitle() }
         { renderSubtitle() }
