@@ -7,6 +7,7 @@ import { t } from 'i18n/translate';
 import { FolderCog } from 'lucide-react-native';
 import { View } from 'react-native';
 import { DefaultFocus } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
 
 import { styles } from './BookmarksScreen.style.atv';
 import { BookmarksScreenThumbnail } from './BookmarksScreen.thumbnail.atv';
@@ -21,10 +22,14 @@ export function BookmarksScreenComponent({
   onUpdateFilms,
   openManageCategories,
 }: BookmarksScreenComponentProps) {
+  const { scale } = useAppTheme();
+
   const renderManageButton = () => (
     <ThemedButton
-      variant="outlined"
       IconComponent={ FolderCog }
+      iconProps={ {
+        size: scale(18),
+      } }
       onPress={ openManageCategories }
       withAnimation
     >

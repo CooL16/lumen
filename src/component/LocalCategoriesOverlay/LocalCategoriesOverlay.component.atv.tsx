@@ -7,6 +7,7 @@ import { t } from 'i18n/translate';
 import { Plus, Trash2 } from 'lucide-react-native';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationScrollView, SpatialNavigationView } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './LocalCategoriesOverlay.style.atv';
 import { LocalCategoriesOverlayComponentProps } from './LocalCategoriesOverlay.type';
@@ -27,6 +28,7 @@ export const LocalCategoriesOverlayComponent = ({
   resetMode,
 }: LocalCategoriesOverlayComponentProps) => {
   const styles = useThemedStyles(componentStyles);
+  const { scale } = useAppTheme();
 
   const renderList = () => (
     <>
@@ -50,7 +52,11 @@ export const LocalCategoriesOverlayComponent = ({
               </ThemedText>
               <ThemedButton
                 style={ styles.rowDelete }
+                contentStyle={ styles.rowDeleteContent }
                 IconComponent={ Trash2 }
+                iconProps={ {
+                  size: scale(14),
+                } }
                 onPress={ () => requestDelete(category.id) }
               />
             </View>
@@ -62,6 +68,9 @@ export const LocalCategoriesOverlayComponent = ({
           <DefaultFocus>
             <ThemedButton
               IconComponent={ Plus }
+              iconProps={ {
+                size: scale(14),
+              } }
               onPress={ startCreate }
               contentStyle={ styles.button }
             >

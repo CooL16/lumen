@@ -6,6 +6,8 @@ import { ThemedButton } from 'Component/ThemedButton';
 import { t } from 'i18n/translate';
 import { FolderCog } from 'lucide-react-native';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppTheme } from 'Theme/context';
 
 import { styles } from './BookmarksScreen.style';
 import { BookmarksScreenThumbnail } from './BookmarksScreen.thumbnail';
@@ -20,15 +22,8 @@ export function BookmarksScreenComponent({
   onUpdateFilms,
   openManageCategories,
 }: BookmarksScreenComponentProps) {
-  const renderManageButton = () => (
-    <ThemedButton
-      variant="outlined"
-      IconComponent={ FolderCog }
-      onPress={ openManageCategories }
-    >
-      { t('Manage categories') }
-    </ThemedButton>
-  );
+  const { top } = useSafeAreaInsets();
+  const { scale, theme } = useAppTheme();
 
   const renderContent = () => {
     if (isLoading) {
@@ -44,7 +39,18 @@ export function BookmarksScreenComponent({
               ? t('Create a category to start bookmarking')
               : t('Go to site and create bookmarks group') }
           />
-          { isLocalLibrary && renderManageButton() }
+          { isLocalLibrary && (
+            <ThemedButton
+              IconComponent={ FolderCog }
+              iconProps={ {
+                size: scale(18),
+                color: theme.colors.text,
+              } }
+              onPress={ openManageCategories }
+            >
+              { t('Manage categories') }
+            </ThemedButton>
+          ) }
         </View>
       );
     }
@@ -52,14 +58,24 @@ export function BookmarksScreenComponent({
     return (
       <View style={ styles.content }>
         { isLocalLibrary && (
-          <View style={ styles.header }>
-            { renderManageButton() }
+          <View style={ [styles.header, { paddingTop: top + scale(4) }] }>
+            <ThemedButton
+              style={ styles.manageButton }
+              contentStyle={ styles.manageButtonContent }
+              IconComponent={ FolderCog }
+              iconProps={ {
+                size: scale(20),
+                color: theme.colors.text,
+              } }
+              onPress={ openManageCategories }
+            />
           </View>
         ) }
         <FilmPager
           items={ pagerItems }
           onLoadFilms={ onLoadFilms }
           onUpdateFilms={ onUpdateFilms }
+          isAddSafeArea={ !isLocalLibrary }
         />
       </View>
     );

@@ -16,6 +16,13 @@ export const styles = {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 4,
+  },
+  manageButton: {
+    width: 44,
+    height: 44,
+  },
+  manageButtonContent: {
+    padding: 0,
   },
 } satisfies ThemedStyles;

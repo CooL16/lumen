@@ -11,7 +11,6 @@ import { FilmInterface } from 'Type/Film.interface';
 import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmListInterface } from 'Type/FilmList.interface';
 import { FilmStreamInterface } from 'Type/FilmStream.interface';
-import { FilmType } from 'Type/FilmType.type';
 import { FilmVideoInterface } from 'Type/FilmVideo.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { InfoListInterface } from 'Type/InfoList.interface';
@@ -731,7 +730,7 @@ const RezkaApi = {
     const film: FilmInterface = {
       id,
       link,
-      type: FilmType.FILM,
+      type: parseFilmType(link),
       title,
       poster,
       voices: [],

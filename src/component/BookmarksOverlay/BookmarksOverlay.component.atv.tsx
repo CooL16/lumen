@@ -9,6 +9,7 @@ import { Plus } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { DefaultFocus, SpatialNavigationView } from 'react-tv-space-navigation';
+import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './BookmarksOverlay.style.atv';
 import { BookmarksOverlayComponentProps } from './BookmarksOverlay.type';
@@ -23,6 +24,7 @@ export const BookmarksOverlayComponent = ({
   onClose,
 }: BookmarksOverlayComponentProps) => {
   const styles = useThemedStyles(componentStyles);
+  const { scale } = useAppTheme();
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
 
@@ -85,6 +87,9 @@ export const BookmarksOverlayComponent = ({
           <View style={ styles.actions }>
             <ThemedButton
               IconComponent={ Plus }
+              iconProps={ {
+                size: scale(14),
+              } }
               onPress={ () => setIsCreating(true) }
               contentStyle={ styles.button }
             >

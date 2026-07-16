@@ -8,6 +8,7 @@ import { t } from 'i18n/translate';
 import { Plus } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
+import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './BookmarksOverlay.style';
 import { BookmarksOverlayComponentProps } from './BookmarksOverlay.type';
@@ -22,6 +23,7 @@ export const BookmarksOverlayComponent = ({
   onClose,
 }: BookmarksOverlayComponentProps) => {
   const styles = useThemedStyles(componentStyles);
+  const { scale, theme } = useAppTheme();
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
 
@@ -79,6 +81,10 @@ export const BookmarksOverlayComponent = ({
         <View style={ styles.actions }>
           <ThemedButton
             IconComponent={ Plus }
+            iconProps={ {
+              size: scale(16),
+              color: theme.colors.text,
+            } }
             onPress={ () => setIsCreating(true) }
             contentStyle={ styles.button }
           >

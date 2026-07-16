@@ -21,7 +21,7 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scale(8),
+    gap: scale(12),
     paddingVertical: scale(4),
   },
   rowTitle: {
@@ -33,7 +33,11 @@ export const componentStyles = ({ scale, colors, text }: Theme) => ({
     opacity: 0.7,
   },
   rowDelete: {
-    flex: 0,
+    width: scale(32),
+    height: scale(32),
+  },
+  rowDeleteContent: {
+    padding: 0,
   },
   input: {
     width: '100%',

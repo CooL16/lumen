@@ -6,6 +6,7 @@ import { useThemedStyles } from 'Hooks/useThemedStyles';
 import { t } from 'i18n/translate';
 import { Plus, Trash2 } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
+import { useAppTheme } from 'Theme/context';
 
 import { componentStyles } from './LocalCategoriesOverlay.style';
 import { LocalCategoriesOverlayComponentProps } from './LocalCategoriesOverlay.type';
@@ -26,6 +27,7 @@ export const LocalCategoriesOverlayComponent = ({
   resetMode,
 }: LocalCategoriesOverlayComponentProps) => {
   const styles = useThemedStyles(componentStyles);
+  const { scale, theme } = useAppTheme();
 
   const renderList = () => (
     <>
@@ -48,7 +50,12 @@ export const LocalCategoriesOverlayComponent = ({
             </ThemedText>
             <ThemedButton
               style={ styles.rowDelete }
+              contentStyle={ styles.rowDeleteContent }
               IconComponent={ Trash2 }
+              iconProps={ {
+                size: scale(16),
+                color: theme.colors.text,
+              } }
               onPress={ () => requestDelete(category.id) }
             />
           </View>
@@ -57,6 +64,10 @@ export const LocalCategoriesOverlayComponent = ({
       <View style={ styles.actions }>
         <ThemedButton
           IconComponent={ Plus }
+          iconProps={ {
+            size: scale(16),
+            color: theme.colors.text,
+          } }
           onPress={ startCreate }
           contentStyle={ styles.button }
         >

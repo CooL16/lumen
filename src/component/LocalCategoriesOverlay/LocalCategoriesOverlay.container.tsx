@@ -1,7 +1,7 @@
 import { useConfigContext } from 'Context/ConfigContext';
 import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
 import { t } from 'i18n/translate';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
 import { createLocalCategory, deleteLocalCategory } from 'Util/LocalLibrary';
 
@@ -20,7 +20,7 @@ export const LocalCategoriesOverlayContainer = ({
   const localBookmarks = useLocalBookmarks();
   const [mode, setMode] = useState<LocalCategoriesOverlayMode>('list');
   const [newTitle, setNewTitle] = useState('');
-  const deleteCandidateRef = useRef<LocalCategoryRowInterface | null>(null);
+  const [deleteCandidate, setDeleteCandidate] = useState<LocalCategoryRowInterface | null>(null);
 
   const categories: LocalCategoryRowInterface[] = localBookmarks.categories.map((category) => ({
     id: category.id,
@@ -60,26 +60,26 @@ export const LocalCategoriesOverlayContainer = ({
       return;
     }
 
-    deleteCandidateRef.current = category;
+    setDeleteCandidate(category);
     setMode('confirmDelete');
   };
 
   const cancelDelete = () => {
-    deleteCandidateRef.current = null;
+    setDeleteCandidate(null);
     setMode('list');
   };
 
   const confirmDelete = () => {
-    if (deleteCandidateRef.current) {
-      deleteLocalCategory(deleteCandidateRef.current.id);
+    if (deleteCandidate) {
+      deleteLocalCategory(deleteCandidate.id);
     }
 
-    deleteCandidateRef.current = null;
+    setDeleteCandidate(null);
     setMode('list');
   };
 
   const resetMode = () => {
-    deleteCandidateRef.current = null;
+    setDeleteCandidate(null);
     setNewTitle('');
     setMode('list');
   };
@@ -88,7 +88,7 @@ export const LocalCategoriesOverlayContainer = ({
     overlayRef,
     categories,
     mode,
-    deleteCandidateTitle: deleteCandidateRef.current?.title ?? '',
+    deleteCandidateTitle: deleteCandidate?.title ?? '',
     startCreate,
     cancelCreate,
     submitCreate,
