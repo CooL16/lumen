@@ -1,20 +1,41 @@
 import { pagerItemsReset, pagerItemsUpdater } from 'Component/FilmPager/FilmPager.config';
 import { PagerItemInterface } from 'Component/FilmPager/FilmPager.type';
+import { ThemedOverlayRef } from 'Component/ThemedOverlay/ThemedOverlay.type';
 import { useConfigContext } from 'Context/ConfigContext';
 import { useNetworkContext } from 'Context/NetworkContext';
 import { useServiceContext } from 'Context/ServiceContext';
-import { useEffect, useState } from 'react';
+import { useLocalBookmarks } from 'Hooks/useLocalLibrary';
+import { useEffect, useRef, useState } from 'react';
 import NotificationStore from 'Store/Notification.store';
+import { LocalBookmarksBlob } from 'Type/LocalLibrary.interface';
 import { MenuItemInterface } from 'Type/MenuItem.interface';
+import { getLocalBookmarks, getLocalFilmsForCategory } from 'Util/LocalLibrary';
 
 import BookmarksScreenComponent from './BookmarksScreen.component';
 import BookmarksScreenComponentTV from './BookmarksScreen.component.atv';
 
+const buildLocalPagerItems = (blob: LocalBookmarksBlob): PagerItemInterface[] => (
+  blob.categories.map((category) => ({
+    menuItem: {
+      id: category.id,
+      title: category.title,
+      path: '',
+    },
+    films: getLocalFilmsForCategory(blob, category.id),
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+    },
+  }))
+);
+
 export function BookmarksScreenContainer() {
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
   const [isLoading, setIsLoading] = useState(true);
   const [pagerItems, setPagerItems] = useState<PagerItemInterface[]>([]);
   const { handleConnectionError } = useNetworkContext();
+  const localBookmarks = useLocalBookmarks();
+  const manageCategoriesOverlayRef = useRef<ThemedOverlayRef | null>(null);
 
   const { isSignedIn, currentService } = useServiceContext();
 
@@ -51,16 +72,30 @@ export function BookmarksScreenContainer() {
   };
 
   useEffect(() => {
+    if (isLocalLibrary) {
+      setPagerItems(buildLocalPagerItems(localBookmarks));
+      setIsLoading(false);
+
+      return;
+    }
+
     if (isSignedIn) {
       loadBookmarks();
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, isLocalLibrary, localBookmarks]);
 
   const onLoadFilms = async (
     menuItem: MenuItemInterface,
     currentPage: number,
     isRefresh: boolean
   ) => {
+    if (isLocalLibrary) {
+      return {
+        films: getLocalFilmsForCategory(getLocalBookmarks(), menuItem.id),
+        totalPages: 1,
+      };
+    }
+
     if (isRefresh) {
       setPagerItems(pagerItemsReset(menuItem.id));
     }
@@ -73,11 +108,18 @@ export function BookmarksScreenContainer() {
 
   const onUpdateFilms = (key: string, item: PagerItemInterface) => setPagerItems(pagerItemsUpdater(key, item));
 
+  const openManageCategories = () => {
+    manageCategoriesOverlayRef.current?.open();
+  };
+
   const containerProps = {
     isLoading,
     pagerItems,
+    isLocalLibrary,
+    manageCategoriesOverlayRef,
     onLoadFilms,
     onUpdateFilms,
+    openManageCategories,
   };
 
   // eslint-disable-next-line max-len

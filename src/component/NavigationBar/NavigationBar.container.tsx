@@ -11,20 +11,20 @@ import { NavigationBarContainerProps } from './NavigationBar.type';
 export function NavigationBarContainer(props: NavigationBarContainerProps) {
   const { profile } = useServiceContext();
   const { isSignedIn } = useServiceContext();
-  const { isTV } = useConfigContext();
+  const { isTV, isLocalLibrary } = useConfigContext();
   const { navigation, state } = props;
 
   const getRedirectRoute = useCallback((name: string) => {
     // if not signed in, we should redirect to account page
-    if (!isSignedIn && (name === BOOKMARKS_TAB
-      || name === RECENT_TAB
-      || name === NOTIFICATIONS_TAB
+    // (bookmarks and recent stay available when they are stored locally)
+    if (!isSignedIn && (name === NOTIFICATIONS_TAB
+      || (!isLocalLibrary && (name === BOOKMARKS_TAB || name === RECENT_TAB))
     )) {
       return ACCOUNT_TAB;
     }
 
     return name;
-  }, [isSignedIn]);
+  }, [isSignedIn, isLocalLibrary]);
 
   const onPress = useCallback((name: string) => {
     const route = getRedirectRoute(name);
