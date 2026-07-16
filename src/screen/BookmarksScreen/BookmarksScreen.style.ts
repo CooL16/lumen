@@ -25,4 +25,8 @@ export const styles = {
   manageButtonContent: {
     padding: 0,
   },
+  emptyCategory: {
+    paddingTop: 120,
+    alignItems: 'center',
+  },
 } satisfies ThemedStyles;

@@ -1,5 +1,5 @@
-import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import {
   LocalBookmarksBlob,
@@ -26,6 +26,7 @@ import {
   validateNewCategoryTitle,
 } from './logic';
 
+export type { CategoryTitleError } from './logic';
 export {
   bookmarksForFilm as getLocalBookmarksForFilm,
   filmsForCategory as getLocalFilmsForCategory,
@@ -33,7 +34,6 @@ export {
   parseBookmarksBlob,
   parseHistoryList,
 } from './logic';
-export type { CategoryTitleError } from './logic';
 
 export const LOCAL_BOOKMARKS_KEY = 'localBookmarks';
 export const LOCAL_HISTORY_KEY = 'localHistory';

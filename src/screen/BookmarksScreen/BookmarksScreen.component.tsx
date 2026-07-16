@@ -25,6 +25,15 @@ export function BookmarksScreenComponent({
   const { top } = useSafeAreaInsets();
   const { scale, theme } = useAppTheme();
 
+  const renderEmptyCategory = () => (
+    <View style={ styles.emptyCategory }>
+      <InfoBlock
+        title={ t('No items') }
+        subtitle={ t('Add films to this category from the film page') }
+      />
+    </View>
+  );
+
   const renderContent = () => {
     if (isLoading) {
       return <BookmarksScreenThumbnail />;
@@ -76,6 +85,8 @@ export function BookmarksScreenComponent({
           onLoadFilms={ onLoadFilms }
           onUpdateFilms={ onUpdateFilms }
           isAddSafeArea={ !isLocalLibrary }
+          isEmpty={ isLocalLibrary }
+          ListEmptyComponent={ renderEmptyCategory() }
         />
       </View>
     );

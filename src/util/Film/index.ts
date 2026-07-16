@@ -1,5 +1,5 @@
-import { FilmCardInterface } from 'Type/FilmCard.interface';
 import { FilmInterface } from 'Type/Film.interface';
+import { FilmCardInterface } from 'Type/FilmCard.interface';
 
 export const isBookmarked = (film: FilmInterface) => {
   const { bookmarks = [] } = film;

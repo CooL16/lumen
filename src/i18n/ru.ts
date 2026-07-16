@@ -165,6 +165,7 @@ const ru: Translations = {
   'Create': 'Создать',
   'Manage categories': 'Управление категориями',
   'Create a category to start bookmarking': 'Создайте категорию, чтобы добавлять закладки',
+  'Add films to this category from the film page': 'Добавляйте фильмы в эту категорию со страницы фильма',
   'The category and its bookmarks will be removed from this device.': 'Категория и её закладки будут удалены с этого устройства.',
   'Category already exists': 'Категория уже существует',
   'No items': 'Список пустой',

@@ -18,4 +18,8 @@ export const styles = {
     paddingHorizontal: 32,
     paddingBottom: 8,
   },
+  emptyCategory: {
+    paddingTop: 80,
+    alignItems: 'center',
+  },
 } satisfies ThemedStyles;

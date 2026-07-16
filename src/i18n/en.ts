@@ -163,6 +163,7 @@ const en = {
   'Create': 'Create',
   'Manage categories': 'Manage categories',
   'Create a category to start bookmarking': 'Create a category to start bookmarking',
+  'Add films to this category from the film page': 'Add films to this category from the film page',
   'The category and its bookmarks will be removed from this device.': 'The category and its bookmarks will be removed from this device.',
   'Category already exists': 'Category already exists',
   'No items': 'No items',

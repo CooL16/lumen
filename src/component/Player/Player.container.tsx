@@ -28,7 +28,7 @@ import { FilmVideoInterface, SubtitleInterface } from 'Type/FilmVideo.interface'
 import { FilmVoiceInterface } from 'Type/FilmVoice.interface';
 import { isBookmarked } from 'Util/Film';
 import { createMasterPlaylist, getQualityFromResolution } from 'Util/Hls';
-import { getLocalBookmarksForFilm, upsertLocalHistoryItem } from 'Util/LocalLibrary';
+import { upsertLocalHistoryItem } from 'Util/LocalLibrary';
 import { setIntervalSafe } from 'Util/Misc';
 import {
   getBufferTime,
@@ -119,24 +119,19 @@ export function PlayerContainer({
 
   const localBookmarks = useLocalBookmarks();
 
-  // keeps the player bookmark button and overlay in sync with local writes
-  useEffect(() => {
-    if (!isLocalLibrary) {
-      return;
-    }
-
-    film.bookmarks = getLocalBookmarksForFilm(localBookmarks, film.id);
-    setIsFilmBookmarked(isBookmarked(film));
-  }, [localBookmarks, isLocalLibrary]);
+  // in local mode the bookmark state is derived reactively from the local store
+  const isFilmBookmarkedValue = isLocalLibrary
+    ? localBookmarks.categories.some((category) => category.filmIds.includes(film.id))
+    : isFilmBookmarked;
 
   // local history mirrors the moments the account receives saveWatch: playback
-  // start here, episode/voice change in changePlayerVideo
+  // start here, episode/voice change in changePlayerVideo (props are stable for
+  // the lifetime of a player session, and the upsert dedupes by film id)
   useEffect(() => {
     if (isLocalLibrary && !isOffline) {
       upsertLocalHistoryItem(film, voice);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [film, voice, isOffline, isLocalLibrary]);
 
   const initFirestoreSavedTime = useCallback(async (p: VideoPlayer, savedTime: SavedTime | null) => {
     if (firestoreSavedTimeRef.current || !firestoreDb || !profile) {
@@ -695,7 +690,7 @@ export function PlayerContainer({
     selectedAspectRatio,
     isLocked,
     isOverlayOpen,
-    isFilmBookmarked,
+    isFilmBookmarked: isFilmBookmarkedValue,
     isOffline,
     overlayQuality,
     isLoading,

@@ -30,7 +30,6 @@ import { ScheduleItemInterface } from 'Type/ScheduleItem.interface';
 import { getDownloadsDir, normalizeName, TaskIdStorage, uuid } from 'Util/Download';
 import {
   applyLocalScheduleMarks,
-  getLocalBookmarks,
   getLocalBookmarksForFilm,
   setLocalScheduleMark,
 } from 'Util/LocalLibrary';
@@ -145,7 +144,6 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
         const loadedFilm = await currentService.getFilm(link);
 
         if (isLocalLibrary && loadedFilm) {
-          loadedFilm.bookmarks = getLocalBookmarksForFilm(getLocalBookmarks(), loadedFilm.id);
           applyLocalScheduleMarks(loadedFilm);
         }
 
@@ -165,16 +163,15 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
 
   const localBookmarks = useLocalBookmarks();
 
-  // keeps the bookmark button and overlay in sync with local writes (including from the overlay itself)
-  useEffect(() => {
-    if (!isLocalLibrary) {
-      return;
+  // in local mode film.bookmarks is derived reactively from the local store, so the
+  // bookmark button and overlay stay in sync with local writes (including the overlay's own)
+  const filmValue = useMemo(() => {
+    if (!film || !isLocalLibrary) {
+      return film;
     }
 
-    setFilm((prevFilm) => (prevFilm
-      ? { ...prevFilm, bookmarks: getLocalBookmarksForFilm(localBookmarks, prevFilm.id) }
-      : prevFilm));
-  }, [localBookmarks, isLocalLibrary]);
+    return { ...film, bookmarks: getLocalBookmarksForFilm(localBookmarks, film.id) };
+  }, [film, isLocalLibrary, localBookmarks]);
 
   const handleVideoSelect = (video: FilmVideoInterface, voice: FilmVoiceInterface, quality?: string) => {
     RouterStore.pushData(PLAYER_SCREEN, {
@@ -684,7 +681,7 @@ export function FilmScreenContainer({ route }: FilmScreenContainerProps) {
   };
 
   const containerProps = {
-    film,
+    film: filmValue,
     thumbnailPoster,
     visibleScheduleItems: getVisibleScheduleItems(),
     playerVideoSelectorOverlayRef,
