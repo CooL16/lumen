@@ -7,6 +7,7 @@ import {
   LocalHistoryItemInterface,
   LocalScheduleMarks,
 } from 'Type/LocalLibrary.interface';
+import { NotificationInterface } from 'Type/Notification.interface';
 import { uuid } from 'Util/Download';
 import { storage } from 'Util/Storage';
 
@@ -14,6 +15,7 @@ import {
   addCategory,
   CategoryTitleError,
   emptyBookmarksBlob,
+  filterUpdatesForLocalLibrary,
   parseBookmarksBlob,
   parseHistoryList,
   parseScheduleMarks,
@@ -28,9 +30,11 @@ import {
 
 export type { CategoryTitleError } from './logic';
 export {
+  filterUpdatesForLocalLibrary,
   bookmarksForFilm as getLocalBookmarksForFilm,
   filmsForCategory as getLocalFilmsForCategory,
   MAX_LOCAL_HISTORY_ITEMS,
+  normalizeFilmLink,
   parseBookmarksBlob,
   parseHistoryList,
 } from './logic';
@@ -110,6 +114,13 @@ export const toggleLocalBookmark = (
 
 export const getLocalHistory = (): LocalHistoryItemInterface[] => (
   parseHistoryList(getLocalLibraryStorage().loadString(LOCAL_HISTORY_KEY))
+);
+
+/**
+ * Series updates reduced to films tracked locally (bookmarked or in the watch history).
+ */
+export const getLocalSeriesUpdates = (updates: NotificationInterface[]): NotificationInterface[] => (
+  filterUpdatesForLocalLibrary(updates, getLocalBookmarks(), getLocalHistory())
 );
 
 const saveLocalHistory = (items: LocalHistoryItemInterface[]) => {

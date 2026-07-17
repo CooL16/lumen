@@ -6,6 +6,7 @@ import {
   LocalHistoryItemInterface,
   LocalScheduleMarks,
 } from 'Type/LocalLibrary.interface';
+import { NotificationInterface, NotificationItemInterface } from 'Type/Notification.interface';
 import { safeJsonParse } from 'Util/Json';
 
 export const MAX_LOCAL_HISTORY_ITEMS = 200;
@@ -185,3 +186,128 @@ export const setScheduleMark = (
     [scheduleItemId]: isWatched,
   },
 });
+
+/**
+ * Pathname of a film link, so links match across provider mirrors and across
+ * relative/absolute forms. Returns the raw input when it cannot be parsed.
+ */
+export const normalizeFilmLink = (link: string): string => {
+  try {
+    const { pathname } = new URL(link, 'https://mirror.invalid');
+
+    return pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+  } catch {
+    return link;
+  }
+};
+
+export const collectLocalFilmLinks = (
+  bookmarks: LocalBookmarksBlob,
+  history: LocalHistoryItemInterface[]
+): Set<string> => new Set(
+  [
+    ...Object.values(bookmarks.films).map((film) => film.link),
+    ...history.map((item) => item.link),
+  ].filter(Boolean).map(normalizeFilmLink)
+);
+
+const EPISODE_MARKER = /(\d+(?:-\d+)?)\s*сери\S*/;
+
+/**
+ * The episode marker of an update-row label ("2 серия", "1-8 серия"), so two
+ * different episodes of one series released the same day both survive dedupe.
+ */
+export const extractEpisodeKey = (info: string): string => info.match(EPISODE_MARKER)?.[1] ?? '';
+
+/**
+ * The voice-over part of an update-row label — whatever follows the episode
+ * marker in "(1 сезон) - 2 серия HDrezka Studio (Украинский)".
+ */
+export const extractVoiceFromInfo = (info: string): string => {
+  const match = info.match(EPISODE_MARKER);
+
+  if (!match || match.index === undefined) {
+    return '';
+  }
+
+  return info.slice(match.index + match[0].length).trim();
+};
+
+/**
+ * Voice titles comparable across their two sources: the film page ("Дубляж")
+ * and the updates widget ("(Дубляж)") — lowercased, whitespace collapsed, and
+ * a fully wrapping parenthesis pair removed. Inner qualifiers like "(18+)" or
+ * "(Украинский)" stay, so they count as different voices.
+ */
+export const normalizeVoiceTitle = (voice: string): string => {
+  const collapsed = voice.trim().replace(/\s+/g, ' ').toLowerCase();
+  const unwrapped = collapsed.match(/^\((.*)\)$/);
+
+  return (unwrapped ? unwrapped[1] : collapsed).trim();
+};
+
+/**
+ * The updates widget emits one row per voice release of the same episode.
+ * For films with a locally watched voice, only that exact voice's rows are
+ * kept (no release in that voice → no notification, matching how the account
+ * tracks a single translation). Films without a known voice (bookmarked but
+ * never watched) collapse to one row per episode.
+ */
+export const dedupeUpdateItems = (
+  items: NotificationItemInterface[],
+  watchedVoiceByLink: Map<string, string>
+): NotificationItemInterface[] => {
+  const keptByKey = new Map<string, NotificationItemInterface>();
+
+  items.forEach((item) => {
+    const normalizedLink = normalizeFilmLink(item.link);
+    const watchedVoice = normalizeVoiceTitle(watchedVoiceByLink.get(normalizedLink) ?? '');
+
+    if (watchedVoice && normalizeVoiceTitle(extractVoiceFromInfo(item.info ?? '')) !== watchedVoice) {
+      return;
+    }
+
+    const key = `${normalizedLink}|${extractEpisodeKey(item.info ?? '')}`;
+
+    if (!keptByKey.has(key)) {
+      keptByKey.set(key, item);
+    }
+  });
+
+  return [...keptByKey.values()];
+};
+
+/**
+ * Series-update date groups reduced to films present in the local library
+ * (any bookmark category or the watch history), one row per film and episode;
+ * empty groups are dropped.
+ */
+export const filterUpdatesForLocalLibrary = (
+  updates: NotificationInterface[],
+  bookmarks: LocalBookmarksBlob,
+  history: LocalHistoryItemInterface[]
+): NotificationInterface[] => {
+  const localLinks = collectLocalFilmLinks(bookmarks, history);
+
+  if (!localLinks.size) {
+    return [];
+  }
+
+  const watchedVoiceByLink = new Map<string, string>();
+
+  history.forEach((item) => {
+    if (item.link && item.voiceTitle) {
+      watchedVoiceByLink.set(normalizeFilmLink(item.link), item.voiceTitle);
+    }
+  });
+
+  return updates
+    .map((group) => ({
+      ...group,
+      items: dedupeUpdateItems(
+        group.items.filter((item) => !!item.link && localLinks.has(normalizeFilmLink(item.link))),
+        watchedVoiceByLink
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+};

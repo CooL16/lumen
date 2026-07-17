@@ -16,9 +16,10 @@ export function NavigationBarContainer(props: NavigationBarContainerProps) {
 
   const getRedirectRoute = useCallback((name: string) => {
     // if not signed in, we should redirect to account page
-    // (bookmarks and recent stay available when they are stored locally)
-    if (!isSignedIn && (name === NOTIFICATIONS_TAB
-      || (!isLocalLibrary && (name === BOOKMARKS_TAB || name === RECENT_TAB))
+    // (in local mode these tabs work from device data, so they stay available)
+    if (!isSignedIn && !isLocalLibrary && (name === BOOKMARKS_TAB
+      || name === RECENT_TAB
+      || name === NOTIFICATIONS_TAB
     )) {
       return ACCOUNT_TAB;
     }
